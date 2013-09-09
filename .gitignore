@@ -33,3 +33,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Django specific
+*.log
+*.pot
+local_settings.py
