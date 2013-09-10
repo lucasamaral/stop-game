@@ -38,3 +38,6 @@ nosetests.xml
 *.log
 *.pot
 local_settings.py
+
+# Databases
+*.db
