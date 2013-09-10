@@ -1,7 +1,10 @@
 # Django settings for game project.
 
+import os
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -69,6 +72,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -108,6 +112,7 @@ ROOT_URLCONF = 'game.urls'
 WSGI_APPLICATION = 'game.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "templates")
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
