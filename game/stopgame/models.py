@@ -1,6 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Player(models.Model):
+    user = models.OneToOneField(User)
+    score = models.IntegerField() #player score through history
+
+
+class Field(models.Model):
+    name = models.CharField(max_length=50)
+    short_name = models.CharField(max_length=7)
+
+
+class GameRound(models.Model):
+    cur_letter = models.CharField(max_length=1)
+
+
+class Letter(models.Model):
+    letter = models.CharField(max_length=1)
+
+
 class GameRoom(models.Model):
     name = models.CharField(max_length=30)
     players = models.ManyToManyField(Player, through='PlayerGameRoom')
@@ -11,33 +29,20 @@ class GameRoom(models.Model):
     selected_letters = models.ManyToManyField(Letter, through='Selection')
 
 
-class GameRound(models.Model):
-    cur_letter = models.CharField(max_length=1)
-
 class Answer(models.Model):
     roundd = models.ForeignKey(GameRound)
     player = models.ForeignKey(Player)
     ans = models.CharField(max_length=50)
-        
 
-class Player(models.Model):
-    user = models.OneToOneField(User)
-    score = models.IntegerField() #player score through history
 
 class PlayerGameRoom(models.Model):
     room = models.ForeignKey(GameRoom)
     player = models.ForeignKey(Player)
     current_score = models.IntegerField()
 
-class Field(models.Model):
-    name = models.CharField(max_length=50)
-    short_name = models.CharField(max_length=7)
 
 class Selection(models.Model):
     letter = models.ForeignKey(Letter)        
     game = models.ForeignKey(GameRoom)
     is_selected = models.BooleanField()
-
-class Letter(models.Model):
-    letter = models.CharField(max_length=1)
         
