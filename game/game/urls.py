@@ -9,4 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'stopgame.views.home'),
+    url(r'^game-configuration/$', 'stopgame.views.game_configuration'),
+    url(r'^play/$', 'stopgame.views.game_play'),
+    url(r'^results/$', 'stopgame.views.results'),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
