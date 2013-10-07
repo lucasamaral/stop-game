@@ -16,6 +16,10 @@ class Field(models.Model):
 
 class Letter(models.Model):
     letter = models.CharField(max_length=1)
+    pre_selected = models.BooleanField()
+
+    def __unicode__(self):
+        return self.letter
 
 
 class GameRoom(models.Model):
@@ -26,6 +30,10 @@ class GameRoom(models.Model):
     round_duration = models.PositiveIntegerField() #time in seconds
     minimum_absolute_stop_time = models.PositiveIntegerField()
     selected_letters = models.ManyToManyField(Letter, through='Selection')
+    is_protected = models.BooleanField(default=False)
+
+    def new_round(self):
+        pass
 
 
 class GameRound(models.Model):
@@ -51,5 +59,5 @@ class PlayerGameRoom(models.Model):
 class Selection(models.Model):
     letter = models.ForeignKey(Letter)        
     game = models.ForeignKey(GameRoom)
-    is_selected = models.BooleanField()
+    already_selected = models.BooleanField()
         

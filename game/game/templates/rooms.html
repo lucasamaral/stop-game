@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Salas</h1>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="col-md-12">
+        <div class="col-md-4">
+          Nome
+        </div>
+        <div class="col-md-2">
+            Quantidade de campos
+          </div>
+        <div class="col-md-3">
+            Protegido?
+        </div>
+      </div>
+      {%for room in rooms %}
+        <div class="col-md-12">
+          <div class="col-md-4">
+          {{room.name}}
+          </div>
+          <div class="col-md-2">
+            {{room.fields.all|length}}
+          </div>
+          <div class="col-md-3">
+            {% if room.is_protected %}
+              Sim
+            {% else %}
+              Nao
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            <a class="btn btn-primary" href="/enter/{{room.id}}">Entrar</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <hr>
+{% endblock %}

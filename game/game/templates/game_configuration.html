@@ -1,12 +1,49 @@
 {% extends "base.html" %}
 {% block title %} Configuration {% endblock %}
 {% block content %}
+<div id="body">
     <div class="container">
       <div class="row">
-        <form>
-          {{form.as_p}}
+        <form method="post">
+        	{% csrf_token %}
+        	<div class="col-md-6">
+	        	<div class="fieldWrapper">
+	            	{{ form.name.errors }}
+	            	<label>Nome: </label> {{ form.name }}
+	        	</div>
+	        	<div class="spaceWrapper">
+	            	{{ form.minimum_absolute_stop_time.errors }}
+	            	<label>Tempo mínimo para alguém pedir stop sem completar: </label> {{ form.minimum_absolute_stop_time }}
+	        	</div>
+	        	<div class="spaceWrapper">
+	            	{{ form.round_duration.errors }}
+	            	<label>Duração máxima: </label> {{ form.round_duration }}
+	        	</div>
+	        	<div class="spaceWrapper">
+	            	{{ form.fields.errors }}
+	            	<label class="col-md-12">Campos: </label>
+	            	{% for c in form.fields.field.choices %}
+	            	<div class="col-md-6">
+	            	<input id="id_selected_letters_{{c.0}}" type="checkbox" value="{{c.0}}" name="fields"></input> {{c.1}}
+	            	</div>
+	            	{% endfor %}
+	        	</div>
+	        </div>
+	        <div class="col-md-6">
+	        	<div class="spaceWrapper">
+	            	{{ form.selected_letters.errors }}
+	            	<label class="col-md-12">Letras selecionadas: </label>
+	            	{% for c in form.selected_letters.field.choices %}
+	            	<div class="col-md-2">
+	            	<input id="id_selected_letters_{{c.0}}" type="checkbox" value="{{c.0}}" name="selected_letters"></input> {{c.1}}
+	            	</div>
+	            	{% endfor %}
+	        	</div>
+	        	<input type="submit" class="btn btn-primary col-md-12" value="Criar sala"></input>
+	        </div>
         </form>
       </div>
     </div>
-      <hr>
+    <hr>
+</div>
 {% endblock %}
