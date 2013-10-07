@@ -10,9 +10,8 @@ class Field(models.Model):
     name = models.CharField(max_length=50)
     short_name = models.CharField(max_length=7)
 
-
-class GameRound(models.Model):
-    cur_letter = models.CharField(max_length=1)
+    def __unicode__(self):
+        return self.name
 
 
 class Letter(models.Model):
@@ -22,17 +21,25 @@ class Letter(models.Model):
 class GameRoom(models.Model):
     name = models.CharField(max_length=30)
     players = models.ManyToManyField(Player, through='PlayerGameRoom')
-    cur_round = models.ForeignKey(GameRound)
+    round_number = models.IntegerField()
     fields = models.ManyToManyField(Field)
     round_duration = models.PositiveIntegerField() #time in seconds
     minimum_absolute_stop_time = models.PositiveIntegerField()
     selected_letters = models.ManyToManyField(Letter, through='Selection')
 
 
+class GameRound(models.Model):
+    cur_letter = models.CharField(max_length=1)
+    room = models.ForeignKey(GameRoom)
+    round_number = models.IntegerField()
+
+
 class Answer(models.Model):
     roundd = models.ForeignKey(GameRound)
     player = models.ForeignKey(Player)
     ans = models.CharField(max_length=50)
+    valid = models.BooleanField()
+    points = models.IntegerField()
 
 
 class PlayerGameRoom(models.Model):
