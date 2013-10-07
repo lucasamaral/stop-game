@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 class Player(models.Model):
     user = models.OneToOneField(User)
@@ -28,9 +29,17 @@ class GameRoom(models.Model):
     round_number = models.IntegerField()
     fields = models.ManyToManyField(Field)
     round_duration = models.PositiveIntegerField() #time in seconds
+    game_duration = models.PositiveIntegerField() #in rounds
     minimum_absolute_stop_time = models.PositiveIntegerField()
     selected_letters = models.ManyToManyField(Letter, through='Selection')
     is_protected = models.BooleanField(default=False)
+    password = models.CharField(max_length=20, blank=True)
+    hash_code = models.CharField(max_length=50, default='n')
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.hash_code = uuid.uuid1().hex
+        super(GameRoom, self).save(*args, **kwargs)
 
     def new_round(self):
         pass

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% block title %} Configuration {% endblock %}
 {% block content %}
 <div id="body">
@@ -7,17 +8,31 @@
         <form method="post">
         	{% csrf_token %}
         	<div class="col-md-6">
+
 	        	<div class="fieldWrapper">
 	            	{{ form.name.errors }}
-	            	<label>Nome: </label> {{ form.name }}
+	            	<label>Nome: </label>
+	            	{% render_field form.name class+="form-control" %}
 	        	</div>
 	        	<div class="spaceWrapper">
 	            	{{ form.minimum_absolute_stop_time.errors }}
-	            	<label>Tempo mínimo para alguém pedir stop sem completar: </label> {{ form.minimum_absolute_stop_time }}
+	            	<label>Tempo mínimo para alguém pedir stop sem completar (em segundos): </label>
+	            	{% render_field form.minimum_absolute_stop_time class+="form-control" %}
 	        	</div>
 	        	<div class="spaceWrapper">
 	            	{{ form.round_duration.errors }}
-	            	<label>Duração máxima: </label> {{ form.round_duration }}
+	            	<label>Duração máxima (em segundos): </label>
+	            	{% render_field form.round_duration class+="form-control" %}
+	        	</div>
+	        	<div class="spaceWrapper">
+	            	{{ form.game_duration.errors }}
+	            	<label>Duração do jogo (em rounds): </label>
+	            	{% render_field form.game_duration class+="form-control" %}
+	        	</div>
+	        	<div class="spaceWrapper">
+	            	{{ form.password.errors }}
+	            	<label>Senha para entrar (deixe vazio para entrada sem senha): </label>
+	            	{% render_field form.password class+="form-control" %}
 	        	</div>
 	        	<div class="spaceWrapper">
 	            	{{ form.fields.errors }}

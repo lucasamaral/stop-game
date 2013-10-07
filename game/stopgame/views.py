@@ -1,7 +1,7 @@
 # Create your views here.
 from django import forms
 from django.shortcuts import render, redirect
-from models import GameRoom, Field, Letter
+from models import GameRoom, Field, Letter, Selection
 
 def home(request):
 	return render(request, 'home.html')
@@ -10,13 +10,26 @@ def game_configuration(request):
 	class GameForm(forms.ModelForm):
 		class Meta:
 			model = GameRoom
-			exclude = ['players', 'round_number']
+			exclude = ['players', 'round_number', 'hash_code', 'is_protected']
+
+		def clean_password(self):
+			print "Arrumando password"
+			if self.cleaned_data['password']:
+				self.cleaned_data['is_protected'] = True
+			else:
+				self.cleaned_data['is_protected'] = False
+			return self.cleaned_data['password']
+
 	if request.method == 'POST':
 		form = GameForm(request.POST)
 		if form.is_valid():
 			room = form.save(commit=False)
 			room.round_number = 0
 			room.save()
+			for let in form.cleaned_data.get('selected_letters'):
+				Selection.objects.create(letter=let, game=room, already_selected=False)
+			for f in form.cleaned_data.get('fields'):
+				room.fields.add(f)
 	else:
 		form = GameForm()
 	form.fields['fields'].widget = forms.CheckboxSelectMultiple()
