@@ -1,8 +1,36 @@
 {% extends "base.html" %}
-{% block title %} AAAAAA {% endblock %}
+{% block title %} Playing at: {{ room.name }} {% endblock %}
 {% block content %}
     <div class="container">
-        <div class="col-md-2 field">
+        <br/>
+        {% for field in fields %}
+            <div class="col-md-2 field">
+                <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-addon">{% if round %} {{ round.cur_letter }} {% endif %}</span>
+                    <input type="text" class="form-control" placeholder="{{ round.cur_letter }}">
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="game-info">
+            <strong>Letras selecionadas</strong>
+            <ul class="nav nav-pills">
+                {% for letter in letters %}
+                <li>
+                    <div class="letters">
+                        <span class="badge">{{ letter }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <br>
+            <p><strong>Round atual</strong> <span class="label label-default size-90">{{ room.round_number }}</span></p>
+            <p><strong>Total de rounds</strong> <span class="label label-default size-90">{{ room.game_duration }}</span></p>
+            <div class="time-info">Tempo <span class="label label-danger size-90">100</span></div>
+        </div>
+
+        <!-- <div class="col-md-2 field">
             <div class="col-md-12 field-header">CEP</div>
             <div class="input-group input-group-sm">
                 <span class="input-group-addon">T</span>
@@ -16,38 +44,9 @@
                 <span class="input-group-addon">A</span>
                 <input type="text" class="form-control" placeholder="A">
             </div>
-        </div>
-        <div class="col-md-2 field">
-            <div class="col-md-12 field-header">CEP</div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">T</span>
-                <input type="text" class="form-control" placeholder="T" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">S</span>
-                <input type="text" class="form-control" placeholder="Sudão" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">A</span>
-                <input type="text" class="form-control" placeholder="A">
-            </div>
-        </div>
-        <div class="col-md-2 field">
-            <div class="col-md-12 field-header">CEP</div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">T</span>
-                <input type="text" class="form-control" placeholder="T" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">S</span>
-                <input type="text" class="form-control" placeholder="Sudão" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">A</span>
-                <input type="text" class="form-control" placeholder="A">
-            </div>
-        </div>
+        </div> -->
     </div>
+    
     <button onclick="requestStop()" class="text-center btn btn-danger btn-lg"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
     <hr>
 <script src="{{STATIC_URL}}js/play.js">
