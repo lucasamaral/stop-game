@@ -1,7 +1,7 @@
 # Create your views here.
 from django import forms
 from django.shortcuts import render, redirect
-from models import GameRoom, Field, Letter, Selection, GameRound, Answers
+from models import GameRoom, Field, Letter, Selection, GameRound, Answer
 
 def home(request):
 	return render(request, 'home.html')
@@ -45,7 +45,7 @@ def game_play(request, room_id):
 	cur_round_query = GameRound.objects.filter(room__id=room_id)
 	player_answers = []
 	# for rnd in cur_round_query:
-	# 	player_answers.append(Answers.objects.filter(roundd__id=rnd.id).filter(player__id=player.id)[0])
+	# 	player_answers.append(Answer.objects.filter(roundd__id=rnd.id).filter(player__id=player.id)[0])
 	
 	return render(request, 'play.html', 
 		{'room': cur_room, 'fields': fields, 'letters': all_letters, 'round': cur_round_query.latest('round_number')})
