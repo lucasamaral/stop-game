@@ -8,8 +8,20 @@
             {% for field in fields %}
                 <div class="col-md-2 field">
                     <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
+                    {% with field.short_name as sname %}
+                        {% for key, value in player_answers.items %}
+                            {% if key == sname %}
+                                {% for ans in value %}
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">{{ans.0.upper}}</span>
+                                        <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ans}}" disabled>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
                     <div class="input-group input-group-sm">
-                        <span class="input-group-addon">{% if round %} {{ round.cur_letter }} {% endif %}</span>
+                        <span class="input-group-addon">{% if round %} {{ round.cur_letter.upper }} {% endif %}</span>
                         <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ round.cur_letter }}">
                     </div>
                 </div>
