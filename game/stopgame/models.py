@@ -69,4 +69,3 @@ class Selection(models.Model):
     letter = models.ForeignKey(Letter)        
     game = models.ForeignKey(GameRoom)
     already_selected = models.BooleanField()
-        

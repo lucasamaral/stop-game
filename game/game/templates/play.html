@@ -3,15 +3,22 @@
 {% block content %}
     <div class="container">
         <br/>
-        {% for field in fields %}
-            <div class="col-md-2 field">
-                <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-addon">{% if round %} {{ round.cur_letter }} {% endif %}</span>
-                    <input type="text" class="form-control" placeholder="{{ round.cur_letter }}">
+        <form form action="{% url 'stopgame.views.send_answers' room.id %}" method="post">
+            {% csrf_token %}
+            {% for field in fields %}
+                <div class="col-md-2 field">
+                    <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-addon">{% if round %} {{ round.cur_letter }} {% endif %}</span>
+                        <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ round.cur_letter }}">
+                    </div>
                 </div>
+            {% endfor %}
+
+            <div class="col-md-2 field">
+                <button type="submit" onclick="requestStop()" class="text-center btn btn-danger btn-lg" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
             </div>
-        {% endfor %}
+        </form>
 
         <div class="game-info">
             <strong>Letras selecionadas</strong>
@@ -47,7 +54,7 @@
         </div> -->
     </div>
     
-    <button onclick="requestStop()" class="text-center btn btn-danger btn-lg"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
+    <!-- <button onclick="requestStop()" class="text-center btn btn-danger btn-lg"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button> -->
     <hr>
 <script src="{{STATIC_URL}}js/play.js">
 {% endblock %}
