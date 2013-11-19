@@ -63,9 +63,13 @@ class GameRound(models.Model):
 class Answer(models.Model):
     roundd = models.ForeignKey(GameRound)
     player = models.ForeignKey(Player)
+    field = models.ForeignKey(Field)
     ans = models.CharField(max_length=50)
     valid = models.BooleanField()
     points = models.IntegerField()
+
+    def __unicode__(self):
+        return 'field:' + str(self.field) + ' valid:' + str(self.valid) + ' points:' + str(self.points)
 
 
 class PlayerGameRoom(models.Model):
@@ -78,4 +82,3 @@ class Selection(models.Model):
     letter = models.ForeignKey(Letter)        
     game = models.ForeignKey(GameRoom)
     already_selected = models.BooleanField()
-        

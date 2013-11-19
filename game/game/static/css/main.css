@@ -11,3 +11,31 @@
 #body{
 	margin-top: 20px;
 }
+
+.letters {
+	padding: 10px 14px;
+	background-color: #e3e3ff; /*color-palette: http://www.color-hex.com/color-palette/1484*/
+	border-radius: 10px;
+}
+
+.game-info {
+	margin-right: 10%;
+	padding: 1%;
+	background-color: #b3e3f4;
+	border-radius: 15px;
+	float: right;
+}
+
+.time-info {
+	padding: 2%;
+	background-color: #230745;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	text-align: center;
+
+}
+
+.size-90 {
+	font-size: 90%;
+}
