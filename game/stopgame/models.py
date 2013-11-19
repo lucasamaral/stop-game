@@ -6,6 +6,9 @@ class Player(models.Model):
     user = models.OneToOneField(User)
     score = models.IntegerField() #player score through history
 
+    def __unicode__(self):
+        return self.user.__unicode__()
+
 
 class Field(models.Model):
     name = models.CharField(max_length=50)
@@ -44,11 +47,17 @@ class GameRoom(models.Model):
     def new_round(self):
         pass
 
+    def __unicode__(self):
+        return self.name
+
 
 class GameRound(models.Model):
     cur_letter = models.CharField(max_length=1)
     room = models.ForeignKey(GameRoom)
     round_number = models.IntegerField()
+
+    def __unicode__(self):
+        return "Round {} of {}".format(self.round_number,self.room.name)
 
 
 class Answer(models.Model):
