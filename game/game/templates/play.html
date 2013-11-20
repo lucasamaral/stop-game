@@ -28,7 +28,7 @@
             {% endfor %}
 
             <div class="col-md-2 field">
-                <button type="submit" onclick="requestStop()" class="text-center btn btn-danger btn-lg" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
+                <button type="submit" onclick="return requestStop()" class="text-center btn btn-danger btn-lg" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
             </div>
         </form>
 
@@ -46,7 +46,7 @@
             <br>
             <p><strong>Round atual</strong> <span class="label label-default size-90">{{ room.round_number }}</span></p>
             <p><strong>Total de rounds</strong> <span class="label label-default size-90">{{ room.game_duration }}</span></p>
-            <div class="time-info">Tempo <span class="label label-danger size-90">100</span></div>
+            <div class="time-info">Tempo <span id="clock" class="label label-danger size-90">100</span></div>
         </div>
 
         <!-- <div class="col-md-2 field">
@@ -68,5 +68,8 @@
     
     <!-- <button onclick="requestStop()" class="text-center btn btn-danger btn-lg"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button> -->
     <hr>
-<script src="{{STATIC_URL}}js/play.js">
+<script src="{{STATIC_URL}}js/play.js"></script>
+<script>
+    var clock = 100.0;
+</script>
 {% endblock %}
