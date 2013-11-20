@@ -40,7 +40,7 @@ def game_configuration(request):
     form.fields['selected_letters'].queryset = Letter.objects.all()
     return render(request,'game_configuration.html', {'form':form})
 
-# TODO: adicionar decorator para apenas usuario logado
+# TODO: restringir para apenas usuario logado
 def game_play(request, room_id):
     cur_room = GameRoom.objects.get(id=room_id)
     fields = cur_room.fields.all()
@@ -50,9 +50,15 @@ def game_play(request, room_id):
         cur_round = GameRound(cur_letter=all_letters[0], room=cur_room, round_number=1)
         cur_round.save()
         rnd = cur_round
+        cur_room.round_number = 1
         cur_round_query = GameRound.objects.filter(room__id=room_id)
     else:
         rnd = cur_round_query.latest('round_number')
+        if cur_room.round_number == rnd.round_number:
+            rnd = None
+        else:
+            cur_room.round_number = rnd.round_number
+    cur_room.save()
 
     user = request.user
     player_query = Player.objects.filter(user__id=user.id)  
@@ -61,7 +67,7 @@ def game_play(request, room_id):
     for rd in cur_round_query:
         query = Answer.objects.filter(roundd__id=rd.id).filter(player__id=player.id)
         if query:
-            for ans in query: # agrupar ans por campo e round
+            for ans in query:
                 if str(ans.field.short_name) not in player_answers.keys():
                     player_answers[str(ans.field.short_name)] = []
                 player_answers[str(ans.field.short_name)].append(str(ans.ans))
@@ -96,9 +102,14 @@ def send_answers(request, room_id):
 
     cur_room = GameRoom.objects.get(id=room_id)
     all_letters = cur_room.selected_letters.all()
-    new_rnd = GameRound(cur_letter=all_letters[rnd.round_number], room=cur_room, round_number=rnd.round_number+1)
-    new_rnd.save()
-    return redirect('stopgame.views.game_play', room_id=room_id)
+    next_letter_num = (rnd.round_number)%len(all_letters)
+    
+    if rnd.round_number+1 <= cur_room.game_duration:
+        new_rnd = GameRound(cur_letter=all_letters[next_letter_num], room=cur_room, round_number=rnd.round_number+1)
+        new_rnd.save()
+        return redirect('stopgame.views.game_play', room_id=room_id)
+    else:
+        return redirect('stopgame.views.results')
 
 def results(request):
     return render(request, 'results.html')
