@@ -48,6 +48,9 @@ def game_configuration(request):
 
 # TODO: restringir para apenas usuario logado
 def game_play(request, room_id):
+    if not request.user.is_authenticated():
+        return HttpResponse("Faca login")
+    
     cur_room = GameRoom.objects.get(id=room_id)
     fields = cur_room.fields.all()
     all_letters = cur_room.selected_letters.all()
@@ -66,9 +69,7 @@ def game_play(request, room_id):
             cur_room.round_number = rnd.round_number
     cur_room.save()
 
-    user = request.user
-    player_query = Player.objects.filter(user__id=user.id)  
-    player = player_query[0]
+    player = request.user.player
 
     if len(PlayerGameRoom.objects.filter(room__id=cur_room.id).filter(player__id=player.id))== 0:
         player_room = PlayerGameRoom(room=cur_room, player=player, current_score=0)
@@ -101,12 +102,10 @@ def receive_ans_ajax(request):
 
     if request.is_ajax() and request.method == 'POST':
         json_data = json.loads(request.readline())
+        print json_data
         
-        user = request.user
-        player_query = Player.objects.filter(user__id=user.id)
-        player = player_query[0]
+        player = request.user.player
         
-        print player
         room_query = GameRoom.objects.filter(players__id=player.id)
         room = room_query[0]
 
@@ -129,6 +128,27 @@ def receive_ans_ajax(request):
             return HttpResponse(request.method + ' is not allowed')
         else:
             return HttpResponse('unknown error')
+
+def everyone_answers(request):
+    if not request.user.is_authenticated():
+        return HttpResponse("Faca login")
+
+    player = request.user.player
+        
+    room_query = GameRoom.objects.filter(players__id=player.id)
+    room = room_query[0]
+
+    round_query = GameRound.objects.filter(room__id=room.id)
+    cur_round = round_query.latest('round_number')
+
+    all_players = room.players.all()
+    ans_dic = {}
+    for player in all_players:
+        ans_dic[player.user.username] = {}
+        ans_query = Answer.objects.filter(roundd__id=cur_round.id).filter(player__id=player.id)
+        for answer in ans_query:
+            ans_dic[player.user.username][answer.field.short_name] = answer.ans
+    return HttpResponse(json.dumps(ans_dic), content_type="application/json")
 
 def results(request):
     return render(request, 'results.html')
@@ -154,6 +174,19 @@ def end_of_round(request):
     else:
         return HttpResponse("Jogo terminado")    
     
+def pre_play(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    if not request.user.player in room.players.all():
+        pg = PlayerGameRoom(player=request.user.player, room=room, current_score=0)
+        pg.save()
+    return render(request, 'pre-play.html', {'room_id': room_id})
+
+def can_play(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    if len(room.players.all()) >= 1:
+        return HttpResponse("YES")
+    return HttpResponse("NO")
+
 def enter_room(request, room_id):
     
     room = GameRoom.objects.get(id=room_id)
@@ -163,7 +196,7 @@ def enter_room(request, room_id):
         else:
             pass
         return render(request, 'enter_room.html')
-    return redirect('stopgame.views.game_play', room_id=room_id)
+    return redirect('stopgame.views.pre_play', room_id=room_id)
 
 def rooms(request):
     rooms = GameRoom.objects.all()

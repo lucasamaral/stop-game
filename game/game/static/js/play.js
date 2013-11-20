@@ -1,21 +1,28 @@
-var player = "Meu Player"
-var clock = 100
-var currentRound = 1;
-var maxClock = 100
-var fields = ["MSE", "PCH", "Carro"]
-var otherPlayers = ["P1", "P2", "P3", "P4", "P5"]
-var currentLetter = ""
-var oldLetters = []
-var otherAnswers = {"A": {"MSE": ""}}
-var CurrentAnswers = {}
-var clockInterval = null;
-var checkInterval = null;
-
 var tempStop = false;
 
-function appendLettertoUsedLetters(letter){
-	$('#used-letters').append('<li><div class="letters"><span class="badge">'+letter+'</span></div></li>');
-}
+$.ajaxSetup({ 
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                 if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                 }
+             }
+         }
+         return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     } 
+});
 
 function generateAnalysisTable(){
 	console.log("Generating analysis table")
@@ -69,7 +76,7 @@ function sendCurrentAnswers(){
 		field = fields[fi]
 		data[field] = $('#'+field+'-'+currentRound).val();
 	}
-	console.log(data)
+	$.post('/send-answers/', JSON.stringify(data));
 }
 
 function waitForNextRound(){
@@ -117,17 +124,19 @@ function isRoundOver(){
 
 function requestOtherAnswers(){
 	console.log("Requesting other answers")
-	return {"P1": {"MSE": "AA", "MSE": "BB", "PCH": "CC","Carro": "VV"},
-			"P2": {"MSE": "DD", "MSE": "PP", "PCH": "EE","Carro": "UU"},
-			"P3": {"MSE": "GG", "MSE": "OO", "PCH": "FF","Carro": "TT"},
-			"P4": {"MSE": "KK", "MSE": "NN", "PCH": "HH","Carro": "SS"},
-			"P5": {"MSE": "LL", "MSE": "MM", "PCH": "QQ","Carro": "RR"}}
+	var data = {}
+	$.ajax({url: '/everyone-answers/',
+			success: function(a){
+						data = a
+					},
+			async: false});
+	return data
 }
 
 function updateClock(time){
 	clock = clock - time;
 	$('#clock').text(clock);
-	if(clock > 0){
+	if(clock > 0 && !tempStop){
 		setTimeout("updateClock(1)",1000);
 	}
 }
@@ -136,7 +145,7 @@ function startNewRound(letter){
 	oldLetters.push(currentLetter);
 	currentLetter = letter;
 	currentRound +=1;
-	appendLettertoUsedLetters(letter);
+	$("#current-round").text(currentRound);
 	updateHtmlNewLetter(letter);
 	cleanAnalysisTable();
 	restartTimer();
