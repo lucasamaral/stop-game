@@ -62,6 +62,7 @@ def game_play(request, room_id):
     cur_room.save()
 
     user = request.user
+    print user
     player_query = Player.objects.filter(user__id=user.id)  
     player = player_query[0]
 

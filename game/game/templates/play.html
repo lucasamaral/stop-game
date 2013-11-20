@@ -22,7 +22,7 @@
                     {% endfor %}
                 </ul>
                 <br>
-                <p><strong>Round atual</strong> <span class="label label-default size-90">{{ room.round_number }}</span></p>
+                <p><strong>Round atual</strong> <span id="current-round" class="label label-default size-90">{{ room.round_number }}</span></p>
                 <p><strong>Total de rounds</strong> <span class="label label-default size-90">{{ room.game_duration }}</span></p>
                 <div class="time-info">Tempo <span id="clock" class="label label-danger size-90">100</span></div>
             </div>
@@ -69,7 +69,14 @@
     $(document).ready(function(){
         startNewRound("A");
     });
-    var clock = 100.0;
+    var thisPlayer = "{{user}}";
+    var currentRound = {{ room.round_number }};
+    var maxClock = {{room.round_duration}}
+    var clock = maxClock;
+    var fields = [{% for field in fields %}"{{field.short_name}}",{% endfor %}]
+    var otherPlayers = [{% for player in room.players.all%}"{{player}}",{%endfor%}]
+    var currentLetter = ""
+    var oldLetters = [{% for letter in letters %}"{{letter}}",{%endfor%}]
 </script>
 
 {% endblock %}
