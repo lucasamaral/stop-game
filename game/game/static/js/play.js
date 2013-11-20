@@ -1,5 +1,29 @@
 var tempStop = false;
 
+$.ajaxSetup({ 
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                 if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                 }
+             }
+         }
+         return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     } 
+});
+
 function generateAnalysisTable(){
 	console.log("Generating analysis table")
 	strrr = "<table class=\"table\"><tr><th></th>"
@@ -52,7 +76,7 @@ function sendCurrentAnswers(){
 		field = fields[fi]
 		data[field] = $('#'+field+'-'+currentRound).val();
 	}
-	console.log(data)
+	$.post('/send-answers/', JSON.stringify(data));
 }
 
 function waitForNextRound(){
@@ -100,11 +124,13 @@ function isRoundOver(){
 
 function requestOtherAnswers(){
 	console.log("Requesting other answers")
-	return {"teste": {"MSE": "AA", "MSE": "BB", "PCH": "CC","Carro": "VV"},
-			"P2": {"MSE": "DD", "MSE": "PP", "PCH": "EE","Carro": "UU"},
-			"P3": {"MSE": "GG", "MSE": "OO", "PCH": "FF","Carro": "TT"},
-			"P4": {"MSE": "KK", "MSE": "NN", "PCH": "HH","Carro": "SS"},
-			"P5": {"MSE": "LL", "MSE": "MM", "PCH": "QQ","Carro": "RR"}}
+	var data = {}
+	$.ajax({url: '/everyone-answers/',
+			success: function(a){
+						data = a
+					},
+			async: false});
+	return data
 }
 
 function updateClock(time){
