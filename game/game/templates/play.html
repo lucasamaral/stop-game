@@ -11,10 +11,10 @@
         <br/>
         <div class="row">
             <div class="game-info col-md-12">
-                <strong>Letras selecionadas</strong>
+                <strong>Letras Possíveis</strong>
                 <ul id="used-letters" class="nav nav-pills">
                     {% for letter in letters %}
-                    <li>
+                    <li id="letter-{{letter}}">
                         <div class="letters">
                             <span class="badge">{{ letter }}</span>
                         </div>

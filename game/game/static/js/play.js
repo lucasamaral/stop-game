@@ -1,9 +1,5 @@
 var tempStop = false;
 
-function appendLettertoUsedLetters(letter){
-	$('#used-letters').append('<li><div class="letters"><span class="badge">'+letter+'</span></div></li>');
-}
-
 function generateAnalysisTable(){
 	console.log("Generating analysis table")
 	strrr = "<table class=\"table\"><tr><th></th>"
@@ -124,7 +120,6 @@ function startNewRound(letter){
 	currentLetter = letter;
 	currentRound +=1;
 	$("#current-round").text(currentRound);
-	appendLettertoUsedLetters(letter);
 	updateHtmlNewLetter(letter);
 	cleanAnalysisTable();
 	restartTimer();

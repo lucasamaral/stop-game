@@ -128,6 +128,9 @@ def results(request):
     return render(request, 'results.html')
 
 def pre_play(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    pg = PlayerGameRoom(player=request.user.player, room=room, current_score=0)
+    pg.save()
     return render(request, 'pre-play.html', {'room_id': room_id})
 
 def can_play(request, room_id):
