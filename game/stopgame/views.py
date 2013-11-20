@@ -90,13 +90,45 @@ def game_play(request, room_id):
         })
 
 @login_required
-def receive_ans_ajax(request):
-    if not request.user.is_authenticated():
-        return HttpResponse("Faca login")
-
+def answer_acceptance(request):
     if request.is_ajax() and request.method == 'POST':
         json_data = json.loads(request.readline())
-        print json_data
+        
+        this_player = request.user.player
+        room = GameRoom.objects.get(players=this_player)
+        cur_round = GameRound.objects.get(room=room)
+
+        for player_name in json_data:
+            play_ans = json_data[player_name]
+            for ans_name in play_ans:
+                ans_value = play_ans[ans_name]
+                ans_db = Answer.objects.get(roundd=cur_round, player=player, field__short_name=ans_name)
+                if ans_value == 'True':
+                    ans_db.positive = ans_db.positive + 1
+                else:
+                    ans_db.negative = ans_db.negative + 1
+
+                if ans_db.positive > ans_db.negative:
+                    ans_db.valid = True;
+                    ans_db.points = 10;
+                else:
+                    ans_db.valid = False;
+                    ans_db.points = 0;
+                ans_db.save()
+        return HttpResponse("OK")
+    else:
+        if not request.is_ajax():
+            return HttpResponse('Only ajax is allowed')
+        elif not request.method == 'POST':
+            return HttpResponse(request.method + ' is not allowed')
+        else:
+            return HttpResponse('unknown error')
+
+
+@login_required
+def receive_ans_ajax(request):
+    if request.is_ajax() and request.method == 'POST':
+        json_data = json.loads(request.readline())
         
         player = request.user.player
         
@@ -163,7 +195,8 @@ def end_of_round(request):
         return HttpResponse("Jogo em andamento")
     else:
         return HttpResponse("Jogo terminado")    
-    
+
+ 
 @login_required
 def pre_play(request, room_id):
     room = GameRoom.objects.get(id=room_id)

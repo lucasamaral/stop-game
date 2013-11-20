@@ -69,6 +69,8 @@ class Answer(models.Model):
     ans = models.CharField(max_length=50)
     valid = models.BooleanField()
     points = models.IntegerField()
+    positive = models.IntegerField(default=0)
+    negative = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.ans
