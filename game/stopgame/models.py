@@ -84,6 +84,9 @@ class PlayerGameRoom(models.Model):
     player = models.ForeignKey(Player)
     current_score = models.IntegerField()
 
+    class Meta:
+        ordering = ('current_score',)
+
 
 class Selection(models.Model):
     letter = models.ForeignKey(Letter)        

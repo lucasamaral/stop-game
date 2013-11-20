@@ -175,8 +175,16 @@ def everyone_answers(request):
     return HttpResponse(json.dumps(ans_dic), content_type="application/json")
 
 
+@login_required
 def results(request):
-    return render(request, 'results.html')
+    player = request.user.player
+    pgr = PlayerGameRoom.objects.filter(player=player)[0]
+    room = pgr.room
+    players = room.playergameroom_set
+    return render(request, 'results.html',{
+        'room' : room,
+        'players' : players
+        })
 
 @login_required
 def end_of_round(request):
@@ -216,9 +224,9 @@ def enter_room(request, room_id):
     room = GameRoom.objects.get(id=room_id)
     if room.is_protected:
         if request.method == 'POST':
-            pass
-        else:
-            pass
+            password = request.POST['senha']
+            if password == room.password:
+                return redirect('stopgame.views.pre_play', room_id=room_id)
         return render(request, 'enter_room.html')
     return redirect('stopgame.views.pre_play', room_id=room_id)
 
