@@ -1,5 +1,6 @@
 var player = "Meu Player"
 var clock = 100
+var currentRound = 1;
 var maxClock = 100
 var fields = ["MSE", "PCH", "Carro"]
 var otherPlayers = ["P1", "P2", "P3", "P4", "P5"]
@@ -94,9 +95,12 @@ function sendAnalysis(){
 
 function appendNewLetter(letter){
 	let = letter.toUpperCase();
-	$('.field').append('<div class="input-group input-group-sm">'+
+	for(fi in fields){
+		field = fields[fi]
+		$('#field-'+field).append('<div class="input-group input-group-sm">'+
                 '<span class="input-group-addon">'+let+'</span>'+
-                '<input type="text" class="form-control" placeholder="'+let+'"></div>');
+                '<input type="text" id="'+field+"-"+currentRound+'" class="form-control" placeholder="'+let+'"></div>');
+	}
 }
 
 function updateHtmlNewLetter(letter){
@@ -114,7 +118,7 @@ function requestOtherAnswers(){
 			"P2": {"MSE": "DD", "MSE": "PP", "PCH": "EE","Carro": "UU"},
 			"P3": {"MSE": "GG", "MSE": "OO", "PCH": "FF","Carro": "TT"},
 			"P4": {"MSE": "KK", "MSE": "NN", "PCH": "HH","Carro": "SS"},
-			"P5": {"MSE": "LL", "MSE": "MM", "PCH": "QQ","Carro": "RR"},}
+			"P5": {"MSE": "LL", "MSE": "MM", "PCH": "QQ","Carro": "RR"}}
 }
 
 function updateClock(time){
@@ -128,6 +132,7 @@ function updateClock(time){
 function startNewRound(letter){
 	oldLetters.push(currentLetter);
 	currentLetter = letter;
+	currentRound +=1;
 	appendLettertoUsedLetters(letter);
 	updateHtmlNewLetter(letter);
 	cleanAnalysisTable();

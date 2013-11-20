@@ -29,10 +29,10 @@
         </div>
         <br/>
         <div class="row">
-            <form form action="{% url 'stopgame.views.send_answers' room.id %}" method="post">
+            <form form action="{% url 'stopgame.views.receive_ans_ajax' %}" method="post">
                 {% csrf_token %}
                 {% for field in fields %}
-                    <div class="col-md-2 field">
+                    <div class="col-md-2 field" id=field-{{field.short_name}}>
                         <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
                         {% with field.short_name as sname %}
                             {% for key, value in player_answers.items %}
