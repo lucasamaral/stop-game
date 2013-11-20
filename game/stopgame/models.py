@@ -7,7 +7,7 @@ class Player(models.Model):
     score = models.IntegerField() #player score through history
 
     def __unicode__(self):
-        return self.user.username + ': ' + str(self.score)
+        return self.user.__unicode__()
 
 
 class Field(models.Model):
@@ -48,7 +48,7 @@ class GameRoom(models.Model):
         pass
 
     def __unicode__(self):
-        return 'Room:' + self.name + ' CurRnd:' + str(self.round_number)
+        return self.name
 
 
 class GameRound(models.Model):
@@ -57,7 +57,7 @@ class GameRound(models.Model):
     round_number = models.IntegerField()
 
     def __unicode__(self):
-        return 'letter->' + self.cur_letter + ' Rnd#' + str(self.round_number)
+        return "Round {} of {}".format(self.round_number,self.room.name)
 
 
 class Answer(models.Model):
