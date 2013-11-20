@@ -54,7 +54,7 @@ def game_play(request, room_id):
         cur_round_query = GameRound.objects.filter(room__id=room_id)
     else:
         rnd = cur_round_query.latest('round_number')
-        if cur_room.round_number == rnd.round_number:
+        if cur_room.game_duration == rnd.round_number:
             rnd = None
         else:
             cur_room.round_number = rnd.round_number
