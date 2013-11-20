@@ -84,7 +84,11 @@ function waitForNextRound(){
 		setTimeout("waitForNextRound()", 2000);
 	}else{
 		tempStop = false;
-		startNewRound("B")
+		if(true){
+			window.location = '/results'
+		}else{
+			startNewRound("B")
+		}
 	}
 }
 

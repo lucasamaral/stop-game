@@ -149,8 +149,16 @@ def everyone_answers(request):
     return HttpResponse(json.dumps(ans_dic), content_type="application/json")
 
 
+@login_required
 def results(request):
-    return render(request, 'results.html')
+    player = request.user.player
+    pgr = PlayerGameRoom.objects.filter(player=player)[0]
+    room = pgr.room
+    players = room.playergameroom_set
+    return render(request, 'results.html',{
+        'room' : room,
+        'players' : players
+        })
 
 def end_of_round(request):
     if not request.user.is_authenticated():
