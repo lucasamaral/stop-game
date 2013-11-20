@@ -1,14 +1,12 @@
 # Create your views here.
 import json
 import datetime
+from pytz import timezone
 from django import forms
 from django.contrib import auth
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player, PlayerGameRoom
-
-
-
 
 
 def home(request):
@@ -150,6 +148,7 @@ def everyone_answers(request):
             ans_dic[player.user.username][answer.field.short_name] = answer.ans
     return HttpResponse(json.dumps(ans_dic), content_type="application/json")
 
+
 def results(request):
     return render(request, 'results.html')
 
@@ -166,8 +165,9 @@ def end_of_round(request):
     
     round_query = GameRound.objects.filter(room__id = cur_room.id )
     cur_round = round_query.latest("round_number")
-    now = datetime.datetime.now()   
-     
+    now = datetime.datetime.now()
+    now = brasil.localize(now)
+
     dt =  now - cur_round.start_time
     if dt.seconds < cur_room.game_duration :
         return HttpResponse("Jogo em andamento")
