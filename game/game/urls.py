@@ -22,5 +22,6 @@ urlpatterns = patterns('',
     url(r'^rooms/$', 'stopgame.views.rooms'),
     url(r'^enter/(?P<room_id>\d+)$', 'stopgame.views.enter_room'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/signup/$', 'django.contrib.auth.views.signup'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
