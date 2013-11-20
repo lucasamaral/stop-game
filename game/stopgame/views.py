@@ -142,6 +142,18 @@ def everyone_answers(request):
 def results(request):
     return render(request, 'results.html')
 
+def pre_play(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    pg = PlayerGameRoom(player=request.user.player, room=room, current_score=0)
+    pg.save()
+    return render(request, 'pre-play.html', {'room_id': room_id})
+
+def can_play(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    if len(room.players.all()) >= 1:
+        return HttpResponse("YES")
+    return HttpResponse("NO")
+
 def enter_room(request, room_id):
     room = GameRoom.objects.get(id=room_id)
     if room.is_protected:
@@ -150,7 +162,7 @@ def enter_room(request, room_id):
         else:
             pass
         return render(request, 'enter_room.html')
-    return redirect('stopgame.views.game_play', room_id=room_id)
+    return redirect('stopgame.views.pre_play', room_id=room_id)
 
 def rooms(request):
     rooms = GameRoom.objects.all()
