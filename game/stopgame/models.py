@@ -55,6 +55,7 @@ class GameRound(models.Model):
     cur_letter = models.CharField(max_length=1)
     room = models.ForeignKey(GameRoom)
     round_number = models.IntegerField()
+    start_time = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return 'letter->' + self.cur_letter + ' Rnd#' + str(self.round_number)

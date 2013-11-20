@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player
+import datetime
 
 def home(request):
     return render(request, 'home.html')
@@ -76,6 +77,8 @@ def game_play(request, room_id):
         'player_answers':player_answers,
         })
 
+  
+
 # usuario logado
 def send_answers(request, room_id):
     cur_round_query = GameRound.objects.filter(room__id=room_id)
@@ -103,7 +106,28 @@ def send_answers(request, room_id):
 def results(request):
     return render(request, 'results.html')
 
+def end_of_round(request):
+    if not request.user.is_authenticated():
+        return HttpResponse("faca login")
+    
+    user = request.user
+    player_query = Player.objects.filter(user__id = user.id)
+    player = player_query[0]
+    
+    room_query = GameRoom.objects.filter(players__id = player.id)
+    cur_room = room_query[0]
+    
+    round_query = GameRound.objects.filter(room__id = cur_room.id )
+    cur_round = round_query.latest("round_number")
+    now = datetime.datetime.now()
+    dt = now - cur_round.start_time
+    if dt.seconds < cur_room.game_duration :
+        return HttpResponse("Jogo em andamento")
+    else:
+        return HttpResponse("Jogo terminado")    
+    
 def enter_room(request, room_id):
+    
     room = GameRoom.objects.get(id=room_id)
     if room.is_protected:
         if request.method == 'POST':
