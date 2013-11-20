@@ -3,70 +3,73 @@
 {% block content %}
     <div class="container">
         <br/>
-        <form form action="{% url 'stopgame.views.send_answers' room.id %}" method="post">
-            {% csrf_token %}
-            {% for field in fields %}
-                <div class="col-md-2 field">
-                    <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
-                    {% with field.short_name as sname %}
-                        {% for key, value in player_answers.items %}
-                            {% if key == sname %}
-                                {% for ans in value %}
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-addon">{{ans.0.upper}}</span>
-                                        <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ans}}" disabled>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endwith %}
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-addon">{% if round %} {{ round.cur_letter.upper }} {% endif %}</span>
-                        <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ round.cur_letter }}">
-                    </div>
-                </div>
-            {% endfor %}
-
-            <div class="col-md-2 field">
-                <button type="submit" onclick="requestStop()" class="text-center btn btn-danger btn-lg" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
+        <div class="row">
+            <div class="col-md-12">
+                <button type="submit" onclick="return requestStop()" class="text-center btn btn-danger btn-block" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
             </div>
-        </form>
-
-        <div class="game-info">
-            <strong>Letras selecionadas</strong>
-            <ul class="nav nav-pills">
-                {% for letter in letters %}
-                <li>
-                    <div class="letters">
-                        <span class="badge">{{ letter }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <br>
-            <p><strong>Round atual</strong> <span class="label label-default size-90">{{ room.round_number }}</span></p>
-            <p><strong>Total de rounds</strong> <span class="label label-default size-90">{{ room.game_duration }}</span></p>
-            <div class="time-info">Tempo <span class="label label-danger size-90">100</span></div>
         </div>
+        <br/>
+        <div class="row">
+            <div class="game-info col-md-12">
+                <strong>Letras selecionadas</strong>
+                <ul id="used-letters" class="nav nav-pills">
+                    {% for letter in letters %}
+                    <li>
+                        <div class="letters">
+                            <span class="badge">{{ letter }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <br>
+                <p><strong>Round atual</strong> <span class="label label-default size-90">{{ room.round_number }}</span></p>
+                <p><strong>Total de rounds</strong> <span class="label label-default size-90">{{ room.game_duration }}</span></p>
+                <div class="time-info">Tempo <span id="clock" class="label label-danger size-90">100</span></div>
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <form form action="{% url 'stopgame.views.receive_ans_ajax' %}" method="post">
+                {% csrf_token %}
+                {% for field in fields %}
+                    <div class="col-md-2 field" id=field-{{field.short_name}}>
+                        <div title="{{ field.name }}"class="col-md-12 field-header">{{ field.short_name }}</div>
+                        {% with field.short_name as sname %}
+                            {% for key, value in player_answers.items %}
+                                {% if key == sname %}
+                                    {% for ans in value %}
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon">{{ans.0.upper}}</span>
+                                            <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ans}}" disabled>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
 
-        <!-- <div class="col-md-2 field">
-            <div class="col-md-12 field-header">CEP</div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">T</span>
-                <input type="text" class="form-control" placeholder="T" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">S</span>
-                <input type="text" class="form-control" placeholder="Sudão" disabled>
-            </div>
-            <div class="input-group input-group-sm">
-                <span class="input-group-addon">A</span>
-                <input type="text" class="form-control" placeholder="A">
-            </div>
-        </div> -->
+                        {% if round %}
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-addon"> {{ round.cur_letter.upper }} </span>
+                            <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ round.cur_letter }}">
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+        <div class="row">
+        <div id="analysis-table" class="col-md-12"></div>
+        </div>
     </div>
-    
-    <!-- <button onclick="requestStop()" class="text-center btn btn-danger btn-lg"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button> -->
     <hr>
-<script src="{{STATIC_URL}}js/play.js">
+{% endblock %}
+{% block scripts %}
+<script src="{{STATIC_URL}}js/play.js"></script>
+<script>
+    $(document).ready(function(){
+        startNewRound("A");
+    });
+    var clock = 100.0;
+</script>
+
 {% endblock %}

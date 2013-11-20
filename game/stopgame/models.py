@@ -1,13 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+import datetime
 
 class Player(models.Model):
     user = models.OneToOneField(User)
     score = models.IntegerField() #player score through history
 
     def __unicode__(self):
-        return self.user.username + ': ' + str(self.score)
+        return self.user.__unicode__()
 
 
 class Field(models.Model):
@@ -48,17 +49,17 @@ class GameRoom(models.Model):
         pass
 
     def __unicode__(self):
-        return 'Room:' + self.name + ' CurRnd:' + str(self.round_number)
+        return self.name
 
 
 class GameRound(models.Model):
     cur_letter = models.CharField(max_length=1)
     room = models.ForeignKey(GameRoom)
     round_number = models.IntegerField()
-    start_time = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(default = datetime.datetime.now)
 
     def __unicode__(self):
-        return 'letter->' + self.cur_letter + ' Rnd#' + str(self.round_number)
+        return "Round {} of {}".format(self.round_number,self.room.name)
 
 
 class Answer(models.Model):
@@ -70,7 +71,10 @@ class Answer(models.Model):
     points = models.IntegerField()
 
     def __unicode__(self):
-        return 'field:' + str(self.field) + ' valid:' + str(self.valid) + ' points:' + str(self.points)
+        return self.ans
+
+    def expected_letter(self):
+        return self.roundd.cur_letter
 
 
 class PlayerGameRoom(models.Model):
