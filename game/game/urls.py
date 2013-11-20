@@ -20,6 +20,6 @@ urlpatterns = patterns('',
     url(r'^everyone-answers/$', 'stopgame.views.everyone_answers'),
     url(r'^rooms/$', 'stopgame.views.rooms'),
     url(r'^enter/(?P<room_id>\d+)$', 'stopgame.views.enter_room'),
-    url(r'^login/$', 'stopgame.views.login_view'),
-    url(r'^logout/$', logout),
+    url(r'^login/$', 'django.contrib.auth.views.login'),
+    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

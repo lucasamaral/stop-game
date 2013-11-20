@@ -99,6 +99,7 @@ function sendAnalysis(){
 			data[player][field] = $('#'+player+"-"+field).is(':checked')
 		}
 	}
+	console.log(data)
 	cleanAnalysisTable();
 	waitForNextRound();
 }
