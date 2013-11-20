@@ -6,7 +6,7 @@ from django.contrib import auth
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player, PlayerGameRoom
-
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -46,7 +46,7 @@ def game_configuration(request):
     form.fields['selected_letters'].queryset = Letter.objects.all()
     return render(request,'game_configuration.html', {'form':form})
 
-# TODO: restringir para apenas usuario logado
+@login_required
 def game_play(request, room_id):
     if not request.user.is_authenticated():
         return HttpResponse("Faca login")
@@ -174,6 +174,7 @@ def end_of_round(request):
     else:
         return HttpResponse("Jogo terminado")    
     
+@login_required
 def pre_play(request, room_id):
     room = GameRoom.objects.get(id=room_id)
     if not request.user.player in room.players.all():
@@ -187,8 +188,8 @@ def can_play(request, room_id):
         return HttpResponse("YES")
     return HttpResponse("NO")
 
+@login_required
 def enter_room(request, room_id):
-    
     room = GameRoom.objects.get(id=room_id)
     if room.is_protected:
         if request.method == 'POST':
