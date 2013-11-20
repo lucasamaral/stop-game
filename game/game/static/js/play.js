@@ -12,6 +12,10 @@ var checkInterval = null;
 
 var tempStop = false;
 
+function appendLettertoUsedLetters(letter){
+	$('#used-letters').append('<li><div class="letters"><span class="badge">'+letter+'</span></div></li>');
+}
+
 function generateAnalysisTable(){
 	console.log("Generating analysis table")
 	console.log(otherAnswers)
@@ -29,9 +33,9 @@ function generateAnalysisTable(){
 			player = otherPlayers[pl]
 			strrr = strrr.concat("<td>"+ "<div class=\"input-group\">"+
       			"<span class=\"input-group-addon\">"+
-        		"<input type=\"checkbox\">"+
+        		"<input id=\""+player+"-"+field+"\" type=\"checkbox\">"+
       			"</span>"+
-      			"<input type=\"text\" id=\""+player+"-"+field+"\" class=\"form-control\" disabled placeholder=\""+otherAnswers[player][field]+"\">"+
+      			"<input type=\"text\" class=\"form-control\" disabled placeholder=\""+otherAnswers[player][field]+"\">"+
     			"</div>"+"</td>");
 		}
 		strrr = strrr.concat("</tr>");
@@ -63,8 +67,29 @@ function sendCurrentAnswers(){
 	console.log("Mandando respostas");
 }
 
+function waitForNextRound(){
+	if(false){
+		setTimeout("waitForNextRound()", 2000);
+	}else{
+		tempStop = false;
+		startNewRound("B")
+	}
+}
+
 function sendAnalysis(){
 	console.log("Sending Analysis")
+	data = {}
+	for(pl in otherPlayers){
+		player = otherPlayers[pl];
+		data[player] = {}
+		for(fi in fields){
+			field = fields[fi]
+			data[player][field] = $('#'+player+"-"+field).is(':checked')
+		}
+	}
+	console.log(data)
+	cleanAnalysisTable();
+	waitForNextRound();
 }
 
 function appendNewLetter(letter){
@@ -103,6 +128,7 @@ function updateClock(time){
 function startNewRound(letter){
 	oldLetters.push(currentLetter);
 	currentLetter = letter;
+	appendLettertoUsedLetters(letter);
 	updateHtmlNewLetter(letter);
 	cleanAnalysisTable();
 	restartTimer();
