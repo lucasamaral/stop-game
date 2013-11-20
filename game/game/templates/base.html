@@ -51,7 +51,8 @@
               </ul>
             </li>
           </ul>
-          <form form action="{% url 'stopgame.views.login_view' %}" method="post" class="navbar-form navbar-right">
+          {% if not user.is_authenticated %}
+          <form form action="{% url 'django.contrib.auth.views.login' %}" method="post" class="navbar-form navbar-right">
             {% csrf_token %}
             <div class="form-group">
               <input type="text" name="username" value="" id="username" placeholder="Username" class="form-control">
@@ -61,6 +62,12 @@
             </div>
             <button type="submit" class="btn btn-success" value="login">Sign in</button>
           </form>
+          {% else %}
+            <ul class="navbar-right navbar-form">
+              <li><a href="/accounts/logout" type="submit" class="btn btn-success">Logout</a></li>
+            </ul>
+            
+          {% endif %}
         </div><!--/.navbar-collapse -->
       </div>
     </div>
