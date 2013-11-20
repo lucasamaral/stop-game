@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %} Pre-play {% endblock %}
+{% block content %}
+  <h3>Esperando por mais um jogador chegar</h3>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+      var read = false
+      function isReadyToplay(){
+        $.get( "/can-play/{{room_id}}", function( data ) {
+          if(data=="YES"){
+            read = true
+          }
+        });
+        if(read){
+          window.location = "/play/{{room_id}}"
+        }else{
+          setTimeout("isReadyToplay()", 5000);
+        }
+      }
+      isReadyToplay();
+    </script>
+{% endblock %}
