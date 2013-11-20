@@ -29,7 +29,7 @@
         </div>
         <br/>
         <div class="row">
-            <form form action="{% url 'stopgame.views.receive_ans_ajax' %}" method="post">
+            <form form action="" method="post">
                 {% csrf_token %}
                 {% for field in fields %}
                     <div class="col-md-2 field" id=field-{{field.short_name}}>
@@ -69,8 +69,9 @@
     $(document).ready(function(){
         startNewRound("A");
     });
+    var roomId = {{room.id}};
     var thisPlayer = "{{user}}";
-    var currentRound = {{ room.round_number }};
+    var currentRound = {{ room.round_number }}-1;
     var maxClock = {{room.round_duration}}
     var clock = maxClock;
     var fields = [{% for field in fields %}"{{field.short_name}}",{% endfor %}]

@@ -57,6 +57,7 @@ class GameRound(models.Model):
     room = models.ForeignKey(GameRoom)
     round_number = models.IntegerField()
     start_time = models.DateTimeField(auto_now_add=True)
+    stopped = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "Round {} of {}".format(self.round_number,self.room.name)

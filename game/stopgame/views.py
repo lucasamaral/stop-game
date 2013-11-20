@@ -90,22 +90,27 @@ def game_play(request, room_id):
         })
 
 @login_required
-def answer_acceptance(request):
+def answer_acceptance(request, round_number):
     if request.is_ajax() and request.method == 'POST':
         json_data = json.loads(request.readline())
+        print json_data
         
         this_player = request.user.player
         room = GameRoom.objects.get(players=this_player)
-        cur_round = GameRound.objects.get(room=room)
+        cur_round = GameRound.objects.get(room=room, round_number=round_number)
 
         for player_name in json_data:
             play_ans = json_data[player_name]
             for ans_name in play_ans:
                 ans_value = play_ans[ans_name]
+                player = Player.objects.get(user__username=player_name)
+                print player, ans_name, ans_value
                 ans_db = Answer.objects.get(roundd=cur_round, player=player, field__short_name=ans_name)
-                if ans_value == 'True':
+                if ans_value:
+                    print "Aumentando"
                     ans_db.positive = ans_db.positive + 1
                 else:
+                    print "Diminuindo"
                     ans_db.negative = ans_db.negative + 1
 
                 if ans_db.positive > ans_db.negative:
@@ -126,7 +131,7 @@ def answer_acceptance(request):
 
 
 @login_required
-def receive_ans_ajax(request):
+def receive_ans_ajax(request, round_number):
     if request.is_ajax() and request.method == 'POST':
         json_data = json.loads(request.readline())
         
@@ -136,7 +141,7 @@ def receive_ans_ajax(request):
         room = room_query[0]
 
         round_query = GameRound.objects.filter(room__id=room.id)
-        cur_round = round_query.latest('round_number')
+        cur_round = round_query.filter(round_number=round_number)[0]
 
         for key in json_data:
             value = json_data[key]
@@ -156,23 +161,26 @@ def receive_ans_ajax(request):
             return HttpResponse('unknown error')
 
 @login_required
-def everyone_answers(request):
+def everyone_answers(request, round_number):
     player = request.user.player
         
     room_query = GameRoom.objects.filter(players__id=player.id)
     room = room_query[0]
 
     round_query = GameRound.objects.filter(room__id=room.id)
-    cur_round = round_query.latest('round_number')
+    cur_round = round_query.filter(round_number=round_number)[0]
 
     all_players = room.players.all()
     ans_dic = {}
+    ok = True
     for player in all_players:
         ans_dic[player.user.username] = {}
-        ans_query = Answer.objects.filter(roundd__id=cur_round.id).filter(player__id=player.id)
+        ans_query = Answer.objects.filter(roundd__id=cur_round.id).filter(player__id=player.id).all()
+        if len(ans_query) < len(room.fields.all()):
+            problematic = False
         for answer in ans_query:
             ans_dic[player.user.username][answer.field.short_name] = answer.ans
-    return HttpResponse(json.dumps(ans_dic), content_type="application/json")
+    return HttpResponse(json.dumps({'ok': ok, 'data':ans_dic}), content_type="application/json")
 
 
 @login_required
@@ -181,6 +189,14 @@ def results(request):
     pgr = PlayerGameRoom.objects.filter(player=player)[0]
     room = pgr.room
     players = room.playergameroom_set
+    for p in players.all():
+        playe = p.player
+        answers = Answer.objects.filter(player=playe)
+        su = 0
+        for an in answers:
+            su+=an.points
+        p.current_score = su
+        p.save()
     return render(request, 'results.html',{
         'room' : room,
         'players' : players
@@ -216,6 +232,45 @@ def pre_play(request, room_id):
 def can_play(request, room_id):
     room = GameRoom.objects.get(id=room_id)
     if len(room.players.all()) >= 1:
+        return HttpResponse("YES")
+    return HttpResponse("NO")
+
+def request_stop(request, room_id, round_id):
+    room = GameRoom.objects.get(id=room_id)
+    roundd = GameRound.objects.get(round_number=round_id, room=room)
+    roundd.stopped = True
+    roundd.save()
+    return HttpResponse("YES")
+
+def game_ended(request, room_id):
+    room = GameRoom.objects.get(id=room_id)
+    if room.round_number > room.game_duration:
+        return HttpResponse("YES")
+    return HttpResponse("NO")
+
+def letter(request, room_id, round_id):
+    room = GameRoom.objects.get(id=room_id)
+    roundd = GameRound.objects.get(round_number=round_id, room=room)
+    return HttpResponse(roundd.cur_letter)
+
+def round_over(request, room_id, round_id):
+    room = GameRoom.objects.get(id=room_id)
+    roundd = GameRound.objects.get(round_number=round_id, room=room)
+    all_letters = room.selected_letters.all()
+    if roundd.stopped:
+        if room.round_number == roundd.round_number:
+            print "Updating room"
+            room.round_number = room.round_number +1
+            g = GameRound(cur_letter=all_letters[roundd.round_number%len(all_letters)], room=room, round_number=roundd.round_number+1)
+            g.save()
+            room.save()
+        return HttpResponse("YES")
+    return HttpResponse("NO")
+
+def round_started(request, room_id, round_id):
+    room = GameRoom.objects.get(id=room_id)
+    roundd = GameRound.objects.filter(round_number=round_id, room=room).exists()
+    if roundd:
         return HttpResponse("YES")
     return HttpResponse("NO")
 

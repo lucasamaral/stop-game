@@ -60,7 +60,13 @@ function cleanAnalysisTable(){
 }
 
 function requestStop(){
-	tempStop = true;
+	var data = {}
+	$.ajax({url: '/request-stop/'+roomId+'/'+currentRound,
+			success: function(a){
+						if(a == "YES")
+							data = true;
+					},
+			async: false});
 	return false;
 }
 
@@ -76,18 +82,37 @@ function sendCurrentAnswers(){
 		field = fields[fi]
 		data[field] = $('#'+field+'-'+currentRound).val();
 	}
-	$.post('/send-answers/', JSON.stringify(data));
+	$.post('/send-answers/'+currentRound, JSON.stringify(data));
 }
 
 function waitForNextRound(){
-	if(false){
+	var data = false
+	$.ajax({url: '/round-started/'+roomId+'/'+(currentRound+1),
+			success: function(a){
+						if(a == "YES")
+							data = true;
+					},
+			async: false});
+	if(!data){
 		setTimeout("waitForNextRound()", 2000);
 	}else{
-		tempStop = false;
-		if(true){
+		var data2 = false
+		$.ajax({url: '/game-ended/'+roomId,
+			success: function(a){
+						if(a == "YES")
+							data2 = true;
+					},
+			async: false});
+		if(data2){
 			window.location = '/results'
 		}else{
-			startNewRound("B")
+			letter = "a"
+			$.ajax({url: '/letter/'+roomId+'/'+(currentRound+1),
+			success: function(a){
+						letter = a
+					},
+			async: false});
+			startNewRound(letter)
 		}
 	}
 }
@@ -103,6 +128,7 @@ function sendAnalysis(){
 			data[player][field] = $('#'+player+"-"+field).is(':checked')
 		}
 	}
+	$.post('/ans-evaluation/'+currentRound, JSON.stringify(data))
 	console.log(data)
 	cleanAnalysisTable();
 	waitForNextRound();
@@ -124,15 +150,25 @@ function updateHtmlNewLetter(letter){
 }
 
 function isRoundOver(){
-	return tempStop;
+	var data = false
+	$.ajax({url: '/is-round-over/'+roomId+'/'+currentRound,
+			success: function(a){
+						if(a == "YES")
+							data = true;
+					},
+			async: false});
+	return data;
 }
 
 function requestOtherAnswers(){
 	console.log("Requesting other answers")
 	var data = {}
-	$.ajax({url: '/everyone-answers/',
+	$.ajax({url: '/everyone-answers/'+currentRound,
 			success: function(a){
-						data = a
+						if(a.ok)
+							data = a.data
+						else
+							data = null
 					},
 			async: false});
 	return data
