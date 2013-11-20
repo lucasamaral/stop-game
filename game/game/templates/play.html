@@ -20,15 +20,18 @@
                             {% endif %}
                         {% endfor %}
                     {% endwith %}
+
+                    {% if round %}
                     <div class="input-group input-group-sm">
-                        <span class="input-group-addon">{% if round %} {{ round.cur_letter.upper }} {% endif %}</span>
+                        <span class="input-group-addon"> {{ round.cur_letter.upper }} </span>
                         <input name="{{ field.short_name }}" id="{{ field.short_name }}" type="text" class="form-control" placeholder="{{ round.cur_letter }}">
                     </div>
+                    {% endif %}
                 </div>
             {% endfor %}
 
             <div class="col-md-2 field">
-                <button type="submit" onclick="requestStop()" class="text-center btn btn-danger btn-lg" value="send"><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
+                <button type="submit" onclick="requestStop()" class="text-center btn btn-danger btn-lg" value="send" {% if not round %} disabled {% endif %}><span class="glyphicon glyphicon-exclamation-sign"></span> STOP</button>
             </div>
         </form>
 
