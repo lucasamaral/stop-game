@@ -46,9 +46,6 @@ def game_configuration(request):
 
 @login_required
 def game_play(request, room_id):
-    if not request.user.is_authenticated():
-        return HttpResponse("Faca login")
-    
     cur_room = GameRoom.objects.get(id=room_id)
     fields = cur_room.fields.all()
     all_letters = cur_room.selected_letters.all()
@@ -92,11 +89,10 @@ def game_play(request, room_id):
         'player_answers':player_answers,
         })
 
-
+@login_required
 def receive_ans_ajax(request):
     if not request.user.is_authenticated():
         return HttpResponse("Faca login")
-
 
     if request.is_ajax() and request.method == 'POST':
         json_data = json.loads(request.readline())
@@ -127,10 +123,8 @@ def receive_ans_ajax(request):
         else:
             return HttpResponse('unknown error')
 
+@login_required
 def everyone_answers(request):
-    if not request.user.is_authenticated():
-        return HttpResponse("Faca login")
-
     player = request.user.player
         
     room_query = GameRoom.objects.filter(players__id=player.id)
@@ -152,13 +146,9 @@ def everyone_answers(request):
 def results(request):
     return render(request, 'results.html')
 
+@login_required
 def end_of_round(request):
-    if not request.user.is_authenticated():
-        return HttpResponse("faca login")
-    
-    user = request.user
-    player_query = Player.objects.filter(user__id = user.id)
-    player = player_query[0]
+    player = request.user.player
     
     room_query = GameRoom.objects.filter(players__id = player.id)
     cur_room = room_query[0]
