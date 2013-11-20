@@ -191,9 +191,9 @@ def enter_room(request, room_id):
     room = GameRoom.objects.get(id=room_id)
     if room.is_protected:
         if request.method == 'POST':
-            pass
-        else:
-            pass
+            password = request.POST['senha']
+            if password == room.password:
+                return redirect('stopgame.views.pre_play', room_id=room_id)
         return render(request, 'enter_room.html')
     return redirect('stopgame.views.pre_play', room_id=room_id)
 

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h4>Senha da sala</h4>
+        <form class="form" method="post">
+          {% csrf_token %}
+          <input type="password" name="senha" placeholder="Senha" class="form-control">
+          <input type="submit" value="Enviar" class="btn btn-primary form-control">
+        </form>
+    </div>
+{% endblock %}
