@@ -69,7 +69,10 @@ class Answer(models.Model):
     points = models.IntegerField()
 
     def __unicode__(self):
-        return 'field:' + str(self.field) + ' valid:' + str(self.valid) + ' points:' + str(self.points)
+        return self.ans
+
+    def expected_letter(self):
+        return self.roundd.cur_letter
 
 
 class PlayerGameRoom(models.Model):
