@@ -8,6 +8,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player, PlayerGameRoom
 from django.contrib.auth.decorators import login_required
+import pytz
 
 def home(request):
     return render(request, 'home.html')
@@ -147,7 +148,10 @@ def receive_ans_ajax(request, round_number):
             value = json_data[key]
             field_query = Field.objects.filter(short_name=key)
             field = field_query[0]
-            valid = value[0].lower() == cur_round.cur_letter.lower()
+            if len(value) >0:
+                valid = value[0].lower() == cur_round.cur_letter.lower()
+            else:
+                valid = False
 
             ans = Answer(roundd=cur_round, player=player, field=field, ans=value, valid=valid,points= 10 if valid else 0 )
             ans.save()
@@ -177,9 +181,6 @@ def everyone_answers(request, round_number):
         ans_dic[player.user.username] = {}
         ans_query = Answer.objects.filter(roundd=cur_round, player=player).all()
         if len(ans_query) < len(room.fields.all()):
-            print player
-            print ans_query
-            print room.fields.all()
             ok = False
         for answer in ans_query:
             ans_dic[player.user.username][answer.field.short_name] = answer.ans
@@ -234,7 +235,7 @@ def pre_play(request, room_id):
 
 def can_play(request, room_id):
     room = GameRoom.objects.get(id=room_id)
-    if len(room.players.all()) > 1:
+    if len(room.players.all()) >= 1:
         return HttpResponse("YES")
     return HttpResponse("NO")
 
@@ -270,14 +271,22 @@ def round_over(request, room_id, round_id):
         return HttpResponse("YES")
     round_query = GameRound.objects.filter(room =room)
     now = datetime.datetime.now()
+    brasil = pytz.timezone('America/Chicago')
     now = brasil.localize(now)
 
     dt =  now - roundd.start_time
     print dt
+    print dt.seconds
+    print room.game_duration
     print now
     print roundd.start_time
-    if dt.seconds < cur_room.game_duration :
+    if dt.seconds < room.round_duration :
         return HttpResponse("NO")
+    if room.round_number == roundd.round_number:
+        print "Updating room"
+        room.round_number = room.round_number +1
+        g = GameRound(cur_letter=all_letters[roundd.round_number%len(all_letters)], room=room, round_number=roundd.round_number+1)
+        g.save()
     return HttpResponse("YES")
 
 def round_started(request, room_id, round_id):
