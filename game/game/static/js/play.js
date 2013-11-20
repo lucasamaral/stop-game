@@ -19,11 +19,9 @@ function appendLettertoUsedLetters(letter){
 
 function generateAnalysisTable(){
 	console.log("Generating analysis table")
-	console.log(otherAnswers)
 	strrr = "<table class=\"table\"><tr><th></th>"
 	for(pl in otherPlayers){
 		player = otherPlayers[pl]
-		console.log(player);
 		strrr = strrr.concat("<th>"+player+"</th>");
 	}
 	strrr = strrr.concat("</tr>");
@@ -66,6 +64,12 @@ function answerStop(){
 
 function sendCurrentAnswers(){
 	console.log("Mandando respostas");
+	var data = {}
+	for(fi in fields){
+		field = fields[fi]
+		data[field] = $('#'+field+'-'+currentRound).val();
+	}
+	console.log(data)
 }
 
 function waitForNextRound(){
@@ -88,7 +92,6 @@ function sendAnalysis(){
 			data[player][field] = $('#'+player+"-"+field).is(':checked')
 		}
 	}
-	console.log(data)
 	cleanAnalysisTable();
 	waitForNextRound();
 }
