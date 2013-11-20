@@ -1,9 +1,10 @@
 # Create your views here.
+import json
 from django import forms
 from django.contrib import auth
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
-from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player
+from models import GameRoom, Field, Letter, Selection, GameRound, Answer, Player, PlayerGameRoom
 
 def home(request):
     return render(request, 'home.html')
@@ -63,6 +64,11 @@ def game_play(request, room_id):
     user = request.user
     player_query = Player.objects.filter(user__id=user.id)  
     player = player_query[0]
+
+    if len(PlayerGameRoom.objects.filter(room__id=cur_room.id).filter(player__id=player.id))== 0:
+        player_room = PlayerGameRoom(room=cur_room, player=player, current_score=0)
+        player_room.save()
+
     player_answers = {}
     for rd in cur_round_query:
         query = Answer.objects.filter(roundd__id=rd.id).filter(player__id=player.id)
@@ -82,34 +88,40 @@ def game_play(request, room_id):
         'player_answers':player_answers,
         })
 
-# usuario logado
-def send_answers(request, room_id):
-    cur_round_query = GameRound.objects.filter(room__id=room_id)
-    rnd = cur_round_query.latest('round_number')
+def receive_ans_ajax(request):
+    if not request.user.is_authenticated():
+        return HttpResponse("Faca login")
 
-    player_query = Player.objects.filter(user__id=request.user.id)
-    player = player_query[0]
+    if request.is_ajax() and request.method == 'POST':
+        json_data = json.loads(request.readline())
+        
+        user = request.user
+        player_query = Player.objects.filter(user__id=user.id)
+        player = player_query[0]
+        
+        print player
+        room_query = GameRoom.objects.filter(players__id=player.id)
+        room = room_query[0]
 
-    for key, value in request.POST.iteritems():
-        if not key == 'csrfmiddlewaretoken':
-            valid = value[0].lower() == rnd.cur_letter.lower()
+        round_query = GameRound.objects.filter(room__id=room.id)
+        cur_round = round_query.latest('round_number')
 
+        for key in json_data:
+            value = json_data[key]
             field_query = Field.objects.filter(short_name=key)
             field = field_query[0]
+            valid = value[0].lower() == cur_round.cur_letter.lower()
 
-            ans = Answer(roundd=rnd, player=player, field=field, ans=value, valid=valid, points= 2 if valid else 0)
+            ans = Answer(roundd=cur_round, player=player, field=field, ans=value, valid=valid,points= 10 if valid else 0 )
             ans.save()
-
-    cur_room = GameRoom.objects.get(id=room_id)
-    all_letters = cur_room.selected_letters.all()
-    next_letter_num = (rnd.round_number)%len(all_letters)
-    
-    if rnd.round_number+1 <= cur_room.game_duration:
-        new_rnd = GameRound(cur_letter=all_letters[next_letter_num], room=cur_room, round_number=rnd.round_number+1)
-        new_rnd.save()
-        return redirect('stopgame.views.game_play', room_id=room_id)
+        return HttpResponse("OK")
     else:
-        return redirect('stopgame.views.results')
+        if not request.is_ajax():
+            return HttpResponse('Only ajax is allowed')
+        elif not request.method == 'POST':
+            return HttpResponse(request.method + ' is not allowed')
+        else:
+            return HttpResponse('unknown error')
 
 def results(request):
     return render(request, 'results.html')
