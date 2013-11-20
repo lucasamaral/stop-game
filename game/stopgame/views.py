@@ -175,9 +175,12 @@ def everyone_answers(request, round_number):
     ok = True
     for player in all_players:
         ans_dic[player.user.username] = {}
-        ans_query = Answer.objects.filter(roundd__id=cur_round.id).filter(player__id=player.id).all()
+        ans_query = Answer.objects.filter(roundd=cur_round, player=player).all()
         if len(ans_query) < len(room.fields.all()):
-            problematic = False
+            print player
+            print ans_query
+            print room.fields.all()
+            ok = False
         for answer in ans_query:
             ans_dic[player.user.username][answer.field.short_name] = answer.ans
     return HttpResponse(json.dumps({'ok': ok, 'data':ans_dic}), content_type="application/json")
@@ -231,7 +234,7 @@ def pre_play(request, room_id):
 
 def can_play(request, room_id):
     room = GameRoom.objects.get(id=room_id)
-    if len(room.players.all()) >= 1:
+    if len(room.players.all()) > 1:
         return HttpResponse("YES")
     return HttpResponse("NO")
 
@@ -265,7 +268,17 @@ def round_over(request, room_id, round_id):
             g.save()
             room.save()
         return HttpResponse("YES")
-    return HttpResponse("NO")
+    round_query = GameRound.objects.filter(room =room)
+    now = datetime.datetime.now()
+    now = brasil.localize(now)
+
+    dt =  now - roundd.start_time
+    print dt
+    print now
+    print roundd.start_time
+    if dt.seconds < cur_room.game_duration :
+        return HttpResponse("NO")
+    return HttpResponse("YES")
 
 def round_started(request, room_id, round_id):
     room = GameRoom.objects.get(id=room_id)
