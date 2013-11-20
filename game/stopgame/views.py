@@ -43,6 +43,9 @@ def game_configuration(request):
 
 # TODO: restringir para apenas usuario logado
 def game_play(request, room_id):
+    if not request.user.is_authenticated():
+        return HttpResponse("Faca login")
+    
     cur_room = GameRoom.objects.get(id=room_id)
     fields = cur_room.fields.all()
     all_letters = cur_room.selected_letters.all()
